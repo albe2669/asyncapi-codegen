@@ -1,15 +1,15 @@
-// More info: https://github.com/lerenn/asyncapi-codegen/issues/130
+// More info: https://github.com/albe2669/asyncapi-codegen/issues/130
 
 package issue130
 
 import (
 	"testing"
 
-	testutil "github.com/lerenn/asyncapi-codegen/test"
-	"github.com/lerenn/asyncapi-codegen/test/v3/issues/130/decoupling"
-	"github.com/lerenn/asyncapi-codegen/test/v3/issues/130/parameters"
-	"github.com/lerenn/asyncapi-codegen/test/v3/issues/130/requestreply"
-	"github.com/lerenn/asyncapi-codegen/test/v3/issues/130/trait"
+	testutil "github.com/albe2669/asyncapi-codegen/test"
+	"github.com/albe2669/asyncapi-codegen/test/v3/issues/130/decoupling"
+	"github.com/albe2669/asyncapi-codegen/test/v3/issues/130/parameters"
+	"github.com/albe2669/asyncapi-codegen/test/v3/issues/130/requestreply"
+	"github.com/albe2669/asyncapi-codegen/test/v3/issues/130/trait"
 	"github.com/stretchr/testify/suite"
 )
 

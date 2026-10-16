@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/lerenn/asyncapi-codegen/pkg/extensions"
+	"github.com/albe2669/asyncapi-codegen/pkg/extensions"
 )
 
 // ECS is a logger that will print logs in Elastic Common Schema ECS format.
@@ -39,7 +39,7 @@ func (ecs ECS) addStandardInfo(msg string, info ...extensions.LogInfo) []extensi
 	})
 	info = append(info, extensions.LogInfo{
 		Key:   "log.logger",
-		Value: "github.com/lerenn/asyncapi-codegen/pkg/extensions/loggers/ecs.go",
+		Value: "github.com/albe2669/asyncapi-codegen/pkg/extensions/loggers/ecs.go",
 	})
 
 	// Return info

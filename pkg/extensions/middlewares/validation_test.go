@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/lerenn/asyncapi-codegen/pkg/extensions"
-	"github.com/lerenn/asyncapi-codegen/pkg/extensions/middlewares"
+	"github.com/albe2669/asyncapi-codegen/pkg/extensions"
+	"github.com/albe2669/asyncapi-codegen/pkg/extensions/middlewares"
 	"github.com/stretchr/testify/require"
 )
 

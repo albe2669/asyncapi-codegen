@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"cloud.google.com/go/civil"
-	issue255default "github.com/lerenn/asyncapi-codegen/test/v2/issues/255/default"
-	issue255ignoredates "github.com/lerenn/asyncapi-codegen/test/v2/issues/255/ignoredates"
+	issue255default "github.com/albe2669/asyncapi-codegen/test/v2/issues/255/default"
+	issue255ignoredates "github.com/albe2669/asyncapi-codegen/test/v2/issues/255/ignoredates"
 	"github.com/stretchr/testify/suite"
 )
 

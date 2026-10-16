@@ -6,9 +6,9 @@ import (
 	"strings"
 	"text/template"
 
-	asyncapi "github.com/lerenn/asyncapi-codegen/pkg/asyncapi/v2"
-	"github.com/lerenn/asyncapi-codegen/pkg/codegen/generators"
-	templateutil "github.com/lerenn/asyncapi-codegen/pkg/utils/template"
+	asyncapi "github.com/albe2669/asyncapi-codegen/pkg/asyncapi/v2"
+	"github.com/albe2669/asyncapi-codegen/pkg/codegen/generators"
+	templateutil "github.com/albe2669/asyncapi-codegen/pkg/utils/template"
 )
 
 // ReferenceToTypeName will convert a reference to a type name in the form of

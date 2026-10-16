@@ -3,7 +3,7 @@ package generators
 import (
 	"testing"
 
-	"github.com/lerenn/asyncapi-codegen/pkg/asyncapi"
+	"github.com/albe2669/asyncapi-codegen/pkg/asyncapi"
 	"github.com/stretchr/testify/assert"
 )
 

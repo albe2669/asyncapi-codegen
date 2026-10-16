@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lerenn/asyncapi-codegen/pkg/extensions"
+	"github.com/albe2669/asyncapi-codegen/pkg/extensions"
 	kafkago "github.com/segmentio/kafka-go"
 	"github.com/stretchr/testify/require"
 )

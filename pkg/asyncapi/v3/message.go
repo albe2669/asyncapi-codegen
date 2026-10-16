@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/lerenn/asyncapi-codegen/pkg/extensions"
-	"github.com/lerenn/asyncapi-codegen/pkg/utils"
+	"github.com/albe2669/asyncapi-codegen/pkg/extensions"
+	"github.com/albe2669/asyncapi-codegen/pkg/utils"
 	"github.com/mohae/deepcopy"
 )
 
@@ -56,6 +56,11 @@ type Message struct {
 	// --- Non AsyncAPI fields -------------------------------------------------
 
 	ReferenceTo *Message `json:"-"`
+
+	// CloudEventSource will be used as the default CloudEvents 'source'
+	// attribute for messages using the CloudEvents format. It is derived
+	// from the specification 'info.title'.
+	CloudEventSource string `json:"-"`
 
 	// CorrelationIDLocation will indicate where the correlation id is
 	// According to: https://www.asyncapi.com/docs/reference/specification/v3.0.0#correlationIdObject
@@ -231,7 +236,8 @@ func (msg *Message) setHeadersDependencies(spec Specification) error {
 	if msg.Headers.Follow().Type != SchemaTypeIsObject.String() {
 		return fmt.Errorf(
 			"%w: %q headers must be an object, is %q",
-			extensions.ErrAsyncAPI, msg.Name, msg.Headers.Follow().Type)
+			extensions.ErrAsyncAPI, msg.Name, msg.Headers.Follow().Type,
+		)
 	}
 
 	return nil

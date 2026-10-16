@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/lerenn/asyncapi-codegen/pkg/asyncapi"
-	"github.com/lerenn/asyncapi-codegen/pkg/utils/template"
+	"github.com/albe2669/asyncapi-codegen/pkg/asyncapi"
+	"github.com/albe2669/asyncapi-codegen/pkg/utils/template"
 )
 
 func appendDirectiveIfDefined(directives []string, tagName string, value float64) []string {

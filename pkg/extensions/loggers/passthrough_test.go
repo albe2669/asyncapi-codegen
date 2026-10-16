@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lerenn/asyncapi-codegen/pkg/extensions"
+	"github.com/albe2669/asyncapi-codegen/pkg/extensions"
 	"github.com/stretchr/testify/assert"
 )
 

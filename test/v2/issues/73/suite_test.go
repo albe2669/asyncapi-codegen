@@ -10,13 +10,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lerenn/asyncapi-codegen/pkg/extensions"
-	"github.com/lerenn/asyncapi-codegen/pkg/extensions/middlewares"
-	"github.com/lerenn/asyncapi-codegen/pkg/extensions/versioning"
-	"github.com/lerenn/asyncapi-codegen/pkg/utils"
-	testutil "github.com/lerenn/asyncapi-codegen/test"
-	v1 "github.com/lerenn/asyncapi-codegen/test/v2/issues/73/v1"
-	v2 "github.com/lerenn/asyncapi-codegen/test/v2/issues/73/v2"
+	"github.com/albe2669/asyncapi-codegen/pkg/extensions"
+	"github.com/albe2669/asyncapi-codegen/pkg/extensions/middlewares"
+	"github.com/albe2669/asyncapi-codegen/pkg/extensions/versioning"
+	"github.com/albe2669/asyncapi-codegen/pkg/utils"
+	testutil "github.com/albe2669/asyncapi-codegen/test"
+	v1 "github.com/albe2669/asyncapi-codegen/test/v2/issues/73/v1"
+	v2 "github.com/albe2669/asyncapi-codegen/test/v2/issues/73/v2"
 	"github.com/stretchr/testify/suite"
 )
 

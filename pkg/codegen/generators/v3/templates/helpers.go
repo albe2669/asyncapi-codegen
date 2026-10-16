@@ -2,15 +2,17 @@ package templates
 
 import (
 	"fmt"
+	"maps"
 	"regexp"
 	"sort"
 	"strconv"
 	"strings"
 	"text/template"
 
-	asyncapi "github.com/lerenn/asyncapi-codegen/pkg/asyncapi/v3"
-	"github.com/lerenn/asyncapi-codegen/pkg/codegen/generators"
-	templateutil "github.com/lerenn/asyncapi-codegen/pkg/utils/template"
+	asyncapi "github.com/albe2669/asyncapi-codegen/pkg/asyncapi/v3"
+	"github.com/albe2669/asyncapi-codegen/pkg/codegen/formats"
+	"github.com/albe2669/asyncapi-codegen/pkg/codegen/generators"
+	templateutil "github.com/albe2669/asyncapi-codegen/pkg/utils/template"
 )
 
 // ChannelToMessageTypeName will convert a channel to a message type name in the
@@ -31,6 +33,43 @@ func OpToMsgTypeName(op asyncapi.Operation) (string, error) {
 		return "", err
 	}
 	return templateutil.Namify(msg.Follow().Name), nil
+}
+
+// formatForMessage returns the registered format matching the message
+// contentType, or nil for the default JSON encoding.
+func formatForMessage(msg *asyncapi.Message) *formats.Format {
+	return formats.ForMessage(msg)
+}
+
+// executeFormatSnippet renders a snippet of the format matching the message
+// contentType. It returns an empty string when there is no format.
+func executeFormatSnippet(msg *asyncapi.Message, snippetKey string) (string, error) {
+	f := formats.ForMessage(msg)
+	if f == nil {
+		return "", nil
+	}
+
+	snippet := f.Snippets.Select(snippetKey)
+	if snippet == "" {
+		return "", nil
+	}
+
+	funcs := template.FuncMap{
+		"cloudEventSpecVersion": CloudEventSpecVersion,
+	}
+	maps.Copy(funcs, templateutil.HelpersFunctions())
+	maps.Copy(funcs, HelpersFunctions())
+	delete(funcs, "formatFields")
+	delete(funcs, "formatConstructorBody")
+	delete(funcs, "formatBrokerToMessage")
+	delete(funcs, "formatMessageToBroker")
+
+	s, err := formats.ExecuteSnippet(f, snippet, msg, funcs)
+	if err != nil {
+		return "", err
+	}
+
+	return strings.TrimSpace(s), nil
 }
 
 // OpToChannelTypeName will convert an operation to a channel type name in the
@@ -361,6 +400,24 @@ func HelpersFunctions() template.FuncMap {
 		"subscribeFuncNameForMessage":    SubscribeFuncNameForMessage,
 		"unsubscribeFuncNameForMessage":  UnsubscribeFuncNameForMessage,
 		"receivedFuncNameForMessage":     ReceivedFuncNameForMessage,
-		"isMultiMessageReceive":          IsMultiMessageReceive,
+
+		"isMultiMessageReceive": IsMultiMessageReceive,
+		"isFormattedMessage":    formatForMessage,
+		"formatFields": func(msg *asyncapi.Message) (string, error) {
+			s, err := executeFormatSnippet(msg, "StructFields")
+			return s, err
+		},
+		"formatConstructorBody": func(msg *asyncapi.Message) (string, error) {
+			s, err := executeFormatSnippet(msg, "ConstructorBody")
+			return s, err
+		},
+		"formatBrokerToMessage": func(msg *asyncapi.Message) (string, error) {
+			s, err := executeFormatSnippet(msg, "BrokerToMessage")
+			return s, err
+		},
+		"formatMessageToBroker": func(msg *asyncapi.Message) (string, error) {
+			s, err := executeFormatSnippet(msg, "MessageToBroker")
+			return s, err
+		},
 	}
 }

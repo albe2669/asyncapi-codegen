@@ -3,9 +3,9 @@ package asyncapiv3
 import (
 	"encoding/json"
 
-	"github.com/lerenn/asyncapi-codegen/pkg/asyncapi"
-	"github.com/lerenn/asyncapi-codegen/pkg/utils"
-	"github.com/lerenn/asyncapi-codegen/pkg/utils/template"
+	"github.com/albe2669/asyncapi-codegen/pkg/asyncapi"
+	"github.com/albe2669/asyncapi-codegen/pkg/utils"
+	"github.com/albe2669/asyncapi-codegen/pkg/utils/template"
 )
 
 // SchemaType is a structure that represents the type of a field.

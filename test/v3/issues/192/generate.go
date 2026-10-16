@@ -2,7 +2,7 @@
 
 package issue192
 
-import "github.com/lerenn/asyncapi-codegen/pkg/utils"
+import "github.com/albe2669/asyncapi-codegen/pkg/utils"
 
 // This is just to test that the generation is correct
 

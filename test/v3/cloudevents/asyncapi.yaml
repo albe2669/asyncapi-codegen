@@ -1,0 +1,78 @@
+asyncapi: 3.0.0
+info:
+  title: cloudevents-test
+  version: 1.0.0
+
+channels:
+  hello:
+    address: v3.cloudevents.hello
+    messages:
+      Hello:
+        $ref: '#/components/messages/Hello'
+  multi:
+    address: v3.cloudevents.multi
+    messages:
+      Ping:
+        $ref: '#/components/messages/Ping'
+      Pong:
+        $ref: '#/components/messages/Pong'
+
+operations:
+  publishHello:
+    action: send
+    channel:
+      $ref: '#/channels/hello'
+  subscribeHello:
+    action: receive
+    channel:
+      $ref: '#/channels/hello'
+  sendMulti:
+    action: send
+    channel:
+      $ref: '#/channels/multi'
+  receiveMulti:
+    action: receive
+    channel:
+      $ref: '#/channels/multi'
+
+components:
+  messages:
+    Hello:
+      contentType: application/cloudevents+json
+      payload:
+        $ref: '#/components/schemas/HelloPayload'
+      correlationID:
+        location: '$message.payload#/correlationid'
+    Ping:
+      contentType: application/cloudevents+json
+      payload:
+        $ref: '#/components/schemas/PingPayload'
+    Pong:
+      contentType: application/cloudevents+json
+      payload:
+        $ref: '#/components/schemas/PongPayload'
+
+  schemas:
+    HelloPayload:
+      type: object
+      properties:
+        greeting:
+          type: string
+        correlationid:
+          type: string
+      required:
+        - greeting
+    PingPayload:
+      type: object
+      properties:
+        ping:
+          type: string
+      required:
+        - ping
+    PongPayload:
+      type: object
+      properties:
+        pong:
+          type: string
+      required:
+        - pong

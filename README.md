@@ -25,6 +25,7 @@ to the application/user. Just plug your application to your favorite message bro
   * [Custom broker](#custom-broker)
 * [CLI options](#cli-options)
 * [Advanced topics](#advanced-topics)
+  * [CloudEvents format](#cloudevents-format)
   * [Middlewares](#middlewares)
   * [Context](#context)
   * [Logging](#logging)
@@ -45,6 +46,7 @@ to the application/user. Just plug your application to your favorite message bro
   * Custom
 * Formats:
   * JSON
+  * CloudEvents (application/cloudevents+json, structured content mode)
 * Logging:
   * Elastic Common Schema (JSON)
   * Text (Humand readable)
@@ -65,6 +67,9 @@ asyncapi-codegen -i ./asyncapi.yaml -p <your-package> -o ./asyncapi.gen.go
 
 # Install dependencies needed by the generated code
 go get -u github.com/lerenn/asyncapi-codegen/pkg/extensions
+
+# Only if some messages use the CloudEvents format:
+go get github.com/cloudevents/sdk-go/v2
 ```
 
 You can also specify the generation part by adding a `go generate` instruction
@@ -364,6 +369,67 @@ Here are the generated JSON sent, given by the different options:
 * Snake case (`snake`): `{ "this_is_a_property": "value" }`
 
 ## Advanced topics
+
+### CloudEvents format
+
+AsyncAPI v3 messages can use the CloudEvents format in structured content
+mode: declare the CloudEvents media type in the message `contentType` and the
+whole CloudEvents envelope becomes the broker payload, as one self-contained
+JSON object:
+
+```yaml
+components:
+  messages:
+    Hello:
+      contentType: application/cloudevents+json
+      payload:
+        type: object
+```
+
+The generated message structure embeds the CloudEvents SDK `event.Event`, so
+attributes and setters are available directly: `msg.SetSource(...)`, `msg.ID()`,
+`msg.Validate()`. The constructor pre-fills the required attributes (`id`,
+`type` and `source`); `source` defaults to the AsyncAPI `info.title`, or to the
+message type name if the title is empty.
+
+An optional `version` parameter sets the CloudEvents spec version, which must
+be `1.0` or `0.3`:
+
+```yaml
+contentType: application/cloudevents+json; version=1.0
+```
+
+To validate CloudEvents messages in a middleware, use
+`middlewares.CloudEventsValidation` instead of `middlewares.Validation`: it
+checks the envelope attributes, then the payload against the generated
+`validate` tags:
+
+```go
+import (
+    "github.com/go-playground/validator/v10"
+    "github.com/lerenn/asyncapi-codegen/pkg/extensions/middlewares"
+)
+
+ctrl, _ := NewUserController(broker, WithMiddlewares(
+    middlewares.CloudEventsValidation(validator.New(), func() any { return &UserMessagePayload{} }),
+))
+```
+
+#### Custom formats
+
+CloudEvents is implemented as a *format* in a registry, not as a special
+case: a format is selected by the message `contentType` media type and
+injects code at fixed points of the generated messages (struct field,
+constructor, broker conversions, imports). When you use the codegen as a
+library (not the CLI), you can add your own formats before generating:
+
+```go
+err := formats.Register(formats.Format{
+    MediaType: "application/x-my-envelope",
+    Imports:   []string{"example.com/myenvelope"},
+    Snippets:  formats.Snippets{ /* ... */ },
+})
+```
 
 ### Middlewares
 

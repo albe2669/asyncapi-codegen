@@ -5,7 +5,7 @@ package issue296
 import (
 	"testing"
 
-	"github.com/lerenn/asyncapi-codegen/pkg/utils"
+	"github.com/albe2669/asyncapi-codegen/pkg/utils"
 	"github.com/stretchr/testify/suite"
 )
 

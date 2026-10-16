@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/lerenn/asyncapi-codegen/pkg/codegen"
+	"github.com/albe2669/asyncapi-codegen/pkg/codegen"
 	"github.com/spf13/cobra"
 )
 
@@ -17,7 +17,7 @@ var cmd = &cobra.Command{
 	Long: `An AsyncAPI Golang Code generator that generates all Go code from the broker to the application/user. 
 Just plug your application to your favorite message broker!
 
-More info on README: https://github.com/lerenn/asyncapi-codegen
+More info on README: https://github.com/albe2669/asyncapi-codegen
 `,
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
 		if len(flags.InputPaths) == 0 {

@@ -3,9 +3,9 @@ package templates
 import (
 	"testing"
 
-	"github.com/lerenn/asyncapi-codegen/pkg/asyncapi"
-	asyncapiv2 "github.com/lerenn/asyncapi-codegen/pkg/asyncapi/v2"
-	"github.com/lerenn/asyncapi-codegen/pkg/codegen/generators"
+	"github.com/albe2669/asyncapi-codegen/pkg/asyncapi"
+	asyncapiv2 "github.com/albe2669/asyncapi-codegen/pkg/asyncapi/v2"
+	"github.com/albe2669/asyncapi-codegen/pkg/codegen/generators"
 	"github.com/stretchr/testify/suite"
 )
 

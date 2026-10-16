@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/lerenn/asyncapi-codegen/pkg/extensions"
+	"github.com/albe2669/asyncapi-codegen/pkg/extensions"
 )
 
 // Validation returns a middleware that validates the message payload against

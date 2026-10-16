@@ -5,8 +5,8 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/lerenn/asyncapi-codegen/pkg/asyncapi"
-	"github.com/lerenn/asyncapi-codegen/pkg/extensions"
+	"github.com/albe2669/asyncapi-codegen/pkg/asyncapi"
+	"github.com/albe2669/asyncapi-codegen/pkg/extensions"
 )
 
 const (
@@ -14,10 +14,8 @@ const (
 	MajorVersion = 3
 )
 
-var (
-	// ErrInvalidReference is sent when a reference is invalid.
-	ErrInvalidReference = fmt.Errorf("%w: invalid reference", extensions.ErrAsyncAPI)
-)
+// ErrInvalidReference is sent when a reference is invalid.
+var ErrInvalidReference = fmt.Errorf("%w: invalid reference", extensions.ErrAsyncAPI)
 
 // Specification is the asyncapi specification struct that will be used to generate
 // code. It should contains every information given in the asyncapi specification.
@@ -93,7 +91,8 @@ func (s *Specification) AddDependency(path string, spec asyncapi.Specification) 
 	if !ok {
 		return fmt.Errorf(
 			"%w: cannot cast %q into 'Specification' (type is %q)",
-			extensions.ErrAsyncAPI, path, reflect.TypeOf(spec))
+			extensions.ErrAsyncAPI, path, reflect.TypeOf(spec),
+		)
 	}
 
 	// Remove local prefix './' if present
@@ -234,7 +233,8 @@ func (s Specification) ReferenceChannel(ref string) (*Channel, error) {
 	if !ok {
 		return nil, fmt.Errorf(
 			"%w: cannot cast %q into 'Channel' (type is %q)",
-			ErrInvalidReference, ref, reflect.TypeOf(obj))
+			ErrInvalidReference, ref, reflect.TypeOf(obj),
+		)
 	}
 
 	// Check that channel is not nil
@@ -258,7 +258,8 @@ func (s Specification) ReferenceChannelBindings(ref string) (*ChannelBindings, e
 	if !ok {
 		return nil, fmt.Errorf(
 			"%w: cannot cast %q into 'ChannelBindings' (type is %q)",
-			ErrInvalidReference, ref, reflect.TypeOf(obj))
+			ErrInvalidReference, ref, reflect.TypeOf(obj),
+		)
 	}
 
 	// Check that channel bindings is not nil
@@ -282,7 +283,8 @@ func (s Specification) ReferenceExternalDocumentation(ref string) (*ExternalDocu
 	if !ok {
 		return nil, fmt.Errorf(
 			"%w: cannot cast %q into 'ExternalDocumentation' (type is %q)",
-			ErrInvalidReference, ref, reflect.TypeOf(obj))
+			ErrInvalidReference, ref, reflect.TypeOf(obj),
+		)
 	}
 
 	// Check that external documentation is not nil
@@ -306,7 +308,8 @@ func (s Specification) ReferenceMessage(ref string) (*Message, error) {
 	if !ok {
 		return nil, fmt.Errorf(
 			"%w: cannot cast %q into 'Message' (type is %q)",
-			ErrInvalidReference, ref, reflect.TypeOf(obj))
+			ErrInvalidReference, ref, reflect.TypeOf(obj),
+		)
 	}
 
 	// Check that message is not nil
@@ -330,7 +333,8 @@ func (s Specification) ReferenceMessageBindings(ref string) (*MessageBindings, e
 	if !ok {
 		return nil, fmt.Errorf(
 			"%w: cannot cast %q into 'MessageBindings' (type is %q)",
-			ErrInvalidReference, ref, reflect.TypeOf(obj))
+			ErrInvalidReference, ref, reflect.TypeOf(obj),
+		)
 	}
 
 	// Check that message bindings is not nil
@@ -354,7 +358,8 @@ func (s Specification) ReferenceMessageExample(ref string) (*MessageExample, err
 	if !ok {
 		return nil, fmt.Errorf(
 			"%w: cannot cast %q into 'MessageExample' (type is %q)",
-			ErrInvalidReference, ref, reflect.TypeOf(obj))
+			ErrInvalidReference, ref, reflect.TypeOf(obj),
+		)
 	}
 
 	// Check that message example is not nil
@@ -378,7 +383,8 @@ func (s Specification) ReferenceMessageTrait(ref string) (*MessageTrait, error) 
 	if !ok {
 		return nil, fmt.Errorf(
 			"%w: cannot cast %q into 'MessageTrait' (type is %q)",
-			ErrInvalidReference, ref, reflect.TypeOf(obj))
+			ErrInvalidReference, ref, reflect.TypeOf(obj),
+		)
 	}
 
 	// Check that message trait is not nil
@@ -402,7 +408,8 @@ func (s Specification) ReferenceOperation(ref string) (*Operation, error) {
 	if !ok {
 		return nil, fmt.Errorf(
 			"%w: cannot cast %q into 'Operation' (type is %q)",
-			ErrInvalidReference, ref, reflect.TypeOf(obj))
+			ErrInvalidReference, ref, reflect.TypeOf(obj),
+		)
 	}
 
 	// Check that operation is not nil
@@ -426,7 +433,8 @@ func (s Specification) ReferenceOperationBindings(ref string) (*OperationBinding
 	if !ok {
 		return nil, fmt.Errorf(
 			"%w: cannot cast %q into 'OperationBindings' (type is %q)",
-			ErrInvalidReference, ref, reflect.TypeOf(obj))
+			ErrInvalidReference, ref, reflect.TypeOf(obj),
+		)
 	}
 
 	// Check that operation bindings is not nil
@@ -450,7 +458,8 @@ func (s Specification) ReferenceOperationReply(ref string) (*OperationReply, err
 	if !ok {
 		return nil, fmt.Errorf(
 			"%w: cannot cast %q into 'OperationReply' (type is %q)",
-			ErrInvalidReference, ref, reflect.TypeOf(obj))
+			ErrInvalidReference, ref, reflect.TypeOf(obj),
+		)
 	}
 
 	// Check that operation reply is not nil
@@ -474,7 +483,8 @@ func (s Specification) ReferenceOperationReplyAddress(ref string) (*OperationRep
 	if !ok {
 		return nil, fmt.Errorf(
 			"%w: cannot cast %q into 'OperationReplyAddress' (type is %q)",
-			ErrInvalidReference, ref, reflect.TypeOf(obj))
+			ErrInvalidReference, ref, reflect.TypeOf(obj),
+		)
 	}
 
 	// Check that operation reply address is not nil
@@ -498,7 +508,8 @@ func (s Specification) ReferenceOperationTrait(ref string) (*OperationTrait, err
 	if !ok {
 		return nil, fmt.Errorf(
 			"%w: cannot cast %q into 'OperationTrait' (type is %q)",
-			ErrInvalidReference, ref, reflect.TypeOf(obj))
+			ErrInvalidReference, ref, reflect.TypeOf(obj),
+		)
 	}
 
 	// Check that operation trait is not nil
@@ -522,7 +533,8 @@ func (s Specification) ReferenceParameter(ref string) (*Parameter, error) {
 	if !ok {
 		return nil, fmt.Errorf(
 			"%w: cannot cast %q into 'Parameter' (type is %q)",
-			ErrInvalidReference, ref, reflect.TypeOf(obj))
+			ErrInvalidReference, ref, reflect.TypeOf(obj),
+		)
 	}
 
 	// Check that parameter is not nil
@@ -546,7 +558,8 @@ func (s Specification) ReferenceSecurity(ref string) (*SecurityScheme, error) {
 	if !ok {
 		return nil, fmt.Errorf(
 			"%w: cannot cast %q into 'SecurityScheme' (type is %q)",
-			ErrInvalidReference, ref, reflect.TypeOf(obj))
+			ErrInvalidReference, ref, reflect.TypeOf(obj),
+		)
 	}
 
 	// Check that security scheme is not nil
@@ -570,7 +583,8 @@ func (s Specification) ReferenceSchema(ref string) (*Schema, error) {
 	if !ok {
 		return nil, fmt.Errorf(
 			"%w: cannot cast %q into 'Schema' (type is %q)",
-			ErrInvalidReference, ref, reflect.TypeOf(obj))
+			ErrInvalidReference, ref, reflect.TypeOf(obj),
+		)
 	}
 
 	// Check that schema is not nil
@@ -594,7 +608,8 @@ func (s Specification) ReferenceServer(ref string) (*Server, error) {
 	if !ok {
 		return nil, fmt.Errorf(
 			"%w: cannot cast %q into 'Server' (type is %q)",
-			ErrInvalidReference, ref, reflect.TypeOf(obj))
+			ErrInvalidReference, ref, reflect.TypeOf(obj),
+		)
 	}
 
 	// Check that server is not nil
@@ -618,7 +633,8 @@ func (s Specification) ReferenceServerBindings(ref string) (*ServerBindings, err
 	if !ok {
 		return nil, fmt.Errorf(
 			"%w: cannot cast %q into 'ServerBindings' (type is %q)",
-			ErrInvalidReference, ref, reflect.TypeOf(obj))
+			ErrInvalidReference, ref, reflect.TypeOf(obj),
+		)
 	}
 
 	// Check that server bindings is not nil
@@ -642,7 +658,8 @@ func (s Specification) ReferenceServerVariable(ref string) (*ServerVariable, err
 	if !ok {
 		return nil, fmt.Errorf(
 			"%w: cannot cast %q into 'ServerVariable' (type is %q)",
-			ErrInvalidReference, ref, reflect.TypeOf(obj))
+			ErrInvalidReference, ref, reflect.TypeOf(obj),
+		)
 	}
 
 	// Check that server variable is not nil
@@ -666,7 +683,8 @@ func (s Specification) ReferenceTag(ref string) (*Tag, error) {
 	if !ok {
 		return nil, fmt.Errorf(
 			"%w: cannot cast %q into 'Tag' (type is %q)",
-			ErrInvalidReference, ref, reflect.TypeOf(obj))
+			ErrInvalidReference, ref, reflect.TypeOf(obj),
+		)
 	}
 
 	// Check that tag is not nil
@@ -698,7 +716,8 @@ func (s Specification) getDependencyBasedOnRef(ref string) (*Specification, stri
 	if !ok {
 		return nil, "", fmt.Errorf(
 			"%w: file %q is not referenced in dependencies %+v",
-			ErrInvalidReference, file, s.dependencies)
+			ErrInvalidReference, file, s.dependencies,
+		)
 	}
 
 	return s2, ref, nil

@@ -3,7 +3,7 @@ package asyncapiv3
 import (
 	"fmt"
 
-	"github.com/lerenn/asyncapi-codegen/pkg/utils/template"
+	"github.com/albe2669/asyncapi-codegen/pkg/utils/template"
 )
 
 // generateFullName generates a full name for a struct.

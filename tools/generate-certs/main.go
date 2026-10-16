@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	testutil "github.com/lerenn/asyncapi-codegen/pkg/utils/test"
+	testutil "github.com/albe2669/asyncapi-codegen/pkg/utils/test"
 )
 
 func main() {

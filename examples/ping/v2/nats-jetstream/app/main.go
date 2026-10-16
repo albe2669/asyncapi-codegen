@@ -6,11 +6,11 @@ import (
 	"context"
 	"time"
 
-	"github.com/lerenn/asyncapi-codegen/examples"
-	"github.com/lerenn/asyncapi-codegen/pkg/extensions/brokers/natsjetstream"
-	"github.com/lerenn/asyncapi-codegen/pkg/extensions/loggers"
-	"github.com/lerenn/asyncapi-codegen/pkg/extensions/middlewares"
-	testutil "github.com/lerenn/asyncapi-codegen/pkg/utils/test"
+	"github.com/albe2669/asyncapi-codegen/examples"
+	"github.com/albe2669/asyncapi-codegen/pkg/extensions/brokers/natsjetstream"
+	"github.com/albe2669/asyncapi-codegen/pkg/extensions/loggers"
+	"github.com/albe2669/asyncapi-codegen/pkg/extensions/middlewares"
+	testutil "github.com/albe2669/asyncapi-codegen/pkg/utils/test"
 	"github.com/nats-io/nats.go/jetstream"
 )
 

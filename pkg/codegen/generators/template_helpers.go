@@ -3,8 +3,8 @@ package generators
 import (
 	"strings"
 
-	"github.com/lerenn/asyncapi-codegen/pkg/utils"
-	"github.com/lerenn/asyncapi-codegen/pkg/utils/template"
+	"github.com/albe2669/asyncapi-codegen/pkg/utils"
+	"github.com/albe2669/asyncapi-codegen/pkg/utils/template"
 )
 
 // These mirror the asyncapi v2/v3 SchemaType values. They are duplicated here as

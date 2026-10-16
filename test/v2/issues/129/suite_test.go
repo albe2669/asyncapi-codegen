@@ -9,14 +9,14 @@ import (
 	"context"
 	"testing"
 
-	"github.com/lerenn/asyncapi-codegen/pkg/extensions"
-	"github.com/lerenn/asyncapi-codegen/pkg/extensions/middlewares"
-	"github.com/lerenn/asyncapi-codegen/pkg/utils"
-	testutil "github.com/lerenn/asyncapi-codegen/test"
-	"github.com/lerenn/asyncapi-codegen/test/v2/issues/129/camel"
-	"github.com/lerenn/asyncapi-codegen/test/v2/issues/129/kebab"
-	"github.com/lerenn/asyncapi-codegen/test/v2/issues/129/none"
-	"github.com/lerenn/asyncapi-codegen/test/v2/issues/129/snake"
+	"github.com/albe2669/asyncapi-codegen/pkg/extensions"
+	"github.com/albe2669/asyncapi-codegen/pkg/extensions/middlewares"
+	"github.com/albe2669/asyncapi-codegen/pkg/utils"
+	testutil "github.com/albe2669/asyncapi-codegen/test"
+	"github.com/albe2669/asyncapi-codegen/test/v2/issues/129/camel"
+	"github.com/albe2669/asyncapi-codegen/test/v2/issues/129/kebab"
+	"github.com/albe2669/asyncapi-codegen/test/v2/issues/129/none"
+	"github.com/albe2669/asyncapi-codegen/test/v2/issues/129/snake"
 	"github.com/stretchr/testify/suite"
 )
 

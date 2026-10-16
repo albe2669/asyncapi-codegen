@@ -3,10 +3,52 @@ package generatorv3
 import (
 	"fmt"
 
-	asyncapi "github.com/lerenn/asyncapi-codegen/pkg/asyncapi/v3"
-	"github.com/lerenn/asyncapi-codegen/pkg/codegen/generators"
-	"github.com/lerenn/asyncapi-codegen/pkg/codegen/options"
+	asyncapi "github.com/albe2669/asyncapi-codegen/pkg/asyncapi/v3"
+	"github.com/albe2669/asyncapi-codegen/pkg/codegen/formats"
+	"github.com/albe2669/asyncapi-codegen/pkg/codegen/generators"
+	"github.com/albe2669/asyncapi-codegen/pkg/codegen/options"
 )
+
+// applyRegisteredFormats runs the Validate and Prepare hooks of the
+// registered format matching each message's contentType.
+func (g Generator) applyRegisteredFormats() error {
+	for _, msg := range g.Specification.Components.Messages {
+		if err := applyFormat(&g.Specification, msg); err != nil {
+			return err
+		}
+	}
+
+	for _, ch := range g.Specification.Channels {
+		for _, msg := range ch.Follow().Messages {
+			// ponytail: channel walk may revisit component messages; the
+			// CloudEvents Prepare hook is idempotent
+			if err := applyFormat(&g.Specification, msg); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+func applyFormat(spec *asyncapi.Specification, msg *asyncapi.Message) error {
+	f := formats.ForMessage(msg)
+	if f == nil {
+		return nil
+	}
+
+	if f.Validate != nil {
+		if err := f.Validate(msg); err != nil {
+			return err
+		}
+	}
+
+	if f.Prepare != nil {
+		return f.Prepare(spec, msg)
+	}
+
+	return nil
+}
 
 // Generator is the structure that contains information to generate the code from
 // the specification.
@@ -19,6 +61,10 @@ type Generator struct {
 
 // Generate generates the source code from the specification.
 func (g Generator) Generate() (string, error) {
+	if err := g.applyRegisteredFormats(); err != nil {
+		return "", err
+	}
+
 	content, err := g.generateImports(g.Options)
 	if err != nil {
 		return "", err
@@ -61,6 +107,9 @@ func (g Generator) generateImports(opts options.Options) (string, error) {
 	imps, err := g.Specification.CustomImports()
 	if err != nil {
 		return "", fmt.Errorf("failed to generate custom imports: %w", err)
+	}
+	for _, imp := range formats.Imports() {
+		imps = append(imps, fmt.Sprintf("%q", imp))
 	}
 
 	return ImportsGenerator{

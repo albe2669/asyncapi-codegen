@@ -7,7 +7,7 @@ import (
 
 const (
 	// dockerImageName is the name of the docker image.
-	dockerImageName = "lerenn/asyncapi-codegen"
+	dockerImageName = "albe2669/asyncapi-codegen"
 )
 
 var (
