@@ -159,11 +159,12 @@ func (c *AppController) SendAsSendUserOperation(
 	params UserChannelParameters,
 	msg UserSignedUpMessage,
 ) error {
-	// Fill UserId from the message ($message.payload#/userId) if not set
-	if params.UserId == "" {
-		if v := msg.Payload.UserId; v != nil {
-			params.UserId = *v
+	if v := msg.Payload.UserId; v != nil {
+		if params.UserId != "" && params.UserId != *v {
+			return fmt.Errorf("parameter UserId is %q but the message carries %q: %w",
+				params.UserId, *v, extensions.ErrParameterMessageMismatch)
 		}
+		params.UserId = *v
 	}
 	// Set channel address
 	addr := fmt.Sprintf("v3.issue139.user.%s", params.UserId)

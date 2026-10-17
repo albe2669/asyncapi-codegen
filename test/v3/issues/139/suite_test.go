@@ -58,9 +58,10 @@ func (suite *Suite) TestParameterFilledFromMessageLocation() {
 	suite.Require().Equal("v3.issue139.user.abc", broker.publishedChannel)
 }
 
-// TestParameterOverridesMessageLocation ensures an explicitly provided
-// parameter is not overwritten by the message location value.
-func (suite *Suite) TestParameterOverridesMessageLocation() {
+// TestParameterMessageMismatchRejected ensures an explicitly provided parameter
+// that contradicts the message payload fails the send instead of silently
+// routing the message against its own data.
+func (suite *Suite) TestParameterMessageMismatchRejected() {
 	broker := &capturingBroker{}
 	ctrl, err := NewAppController(broker)
 	suite.Require().NoError(err)
@@ -70,6 +71,6 @@ func (suite *Suite) TestParameterOverridesMessageLocation() {
 	msg.Payload.UserId = utils.ToPointer("abc")
 
 	err = ctrl.SendAsSendUserOperation(context.Background(), UserChannelParameters{UserId: "override"}, msg)
-	suite.Require().NoError(err)
-	suite.Require().Equal("v3.issue139.user.override", broker.publishedChannel)
+	suite.Require().ErrorIs(err, extensions.ErrParameterMessageMismatch)
+	suite.Require().Empty(broker.publishedChannel)
 }

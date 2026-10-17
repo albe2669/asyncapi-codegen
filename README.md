@@ -60,13 +60,13 @@ In order to use this library in your code, please execute the following lines:
 
 ```shell
 # Install the tool
-go install github.com/lerenn/asyncapi-codegen/cmd/asyncapi-codegen@latest
+go install github.com/albe2669/asyncapi-codegen/cmd/asyncapi-codegen@latest
 
 # Generate the code from the asyncapi file
 asyncapi-codegen -i ./asyncapi.yaml -p <your-package> -o ./asyncapi.gen.go
 
 # Install dependencies needed by the generated code
-go get -u github.com/lerenn/asyncapi-codegen/pkg/extensions
+go get -u github.com/albe2669/asyncapi-codegen/pkg/extensions
 
 # Only if some messages use the CloudEvents format:
 go get github.com/cloudevents/sdk-go/v2
@@ -76,7 +76,7 @@ You can also specify the generation part by adding a `go generate` instruction
 at the beginning of your file:
 
 ```golang
-//go:generate go run github.com/lerenn/asyncapi-codegen/cmd/asyncapi-codegen@<version> -i ./asyncapi.yaml -p <your-package> -o ./asyncapi.gen.go
+//go:generate go run github.com/albe2669/asyncapi-codegen/cmd/asyncapi-codegen@<version> -i ./asyncapi.yaml -p <your-package> -o ./asyncapi.gen.go
 ```
 
 ### Docker image
@@ -84,7 +84,7 @@ at the beginning of your file:
 You can also use the dockerized version of this tool:
 
 ```bash
-docker run -v .:/code -w /code lerenn/asyncapi-codegen asyncapi-codegen -i ./asyncapi.yaml -p <your-package> -o ./asyncapi.gen.go
+docker run -v .:/code -w /code albe2669/asyncapi-codegen asyncapi-codegen -i ./asyncapi.yaml -p <your-package> -o ./asyncapi.gen.go
 ```
 
 ## Concepts
@@ -226,7 +226,7 @@ To use a TLS connection and or authentication for the connection to the nats bro
 
 ```golang
 import (
-"github.com/lerenn/asyncapi-codegen/pkg/extensions/brokers/nats"
+"github.com/albe2669/asyncapi-codegen/pkg/extensions/brokers/nats"
 
 // import natsio go client option
 natsio "github.com/nats-io/nats.go"
@@ -274,7 +274,7 @@ provide a controller to it. Here is the interface that you need to satisfy:
 
 ```go
 import(
-  "github.com/lerenn/asyncapi-codegen/pkg/extensions"
+  "github.com/albe2669/asyncapi-codegen/pkg/extensions"
 )
 
 type BrokerController interface {
@@ -407,7 +407,7 @@ checks the envelope attributes, then the payload against the generated
 ```go
 import (
     "github.com/go-playground/validator/v10"
-    "github.com/lerenn/asyncapi-codegen/pkg/extensions/middlewares"
+    "github.com/albe2669/asyncapi-codegen/pkg/extensions/middlewares"
 )
 
 ctrl, _ := NewUserController(broker, WithMiddlewares(
@@ -457,7 +457,7 @@ middlewares, and finally to the generated code (and subscription callback).
 
 ```golang
 import(
-  "github.com/lerenn/asyncapi-codegen/pkg/extensions"
+  "github.com/albe2669/asyncapi-codegen/pkg/extensions"
   // ...
 )
 
@@ -477,7 +477,7 @@ You can even discriminate on more specification. Please see the [Context section
 
 ```golang
 import(
-  "github.com/lerenn/asyncapi-codegen/pkg/extensions"
+  "github.com/albe2669/asyncapi-codegen/pkg/extensions"
   // ...
 )
 
@@ -491,7 +491,7 @@ func myMiddleware(_ context.Context, msg *extensions.BrokerMessage, _ middleware
 
 ```golang
 import(
-  "github.com/lerenn/asyncapi-codegen/pkg/extensions"
+  "github.com/albe2669/asyncapi-codegen/pkg/extensions"
   // ...
 )
 
@@ -514,7 +514,7 @@ Here is an example:
 
 ```golang
 import(
-  "github.com/lerenn/asyncapi-codegen/pkg/extensions"
+  "github.com/albe2669/asyncapi-codegen/pkg/extensions"
   // ...
 )
 
@@ -539,7 +539,7 @@ When receiving the context from generated code (either in subscription,
 middleware, logging, etc), you can get some information embedded in context.
 
 To get these information, please use the functions from
-`github.com/lerenn/asyncapi-codegen/pkg/extensions`:
+`github.com/albe2669/asyncapi-codegen/pkg/extensions`:
 
 ```golang
 // Execute this middleware only if this is from "ping" channel
@@ -563,7 +563,7 @@ to initialize the controller with a logger, with the function `WithLogger()`:
 
 ```golang
 import(
-  "github.com/lerenn/asyncapi-codegen/pkg/extensions/brokers"
+  "github.com/albe2669/asyncapi-codegen/pkg/extensions/brokers"
   // ...
 )
 
@@ -582,7 +582,7 @@ You can restrict them to a minimum severity level with the `WithLevel` option:
 
 ```golang
 import(
-  log "github.com/lerenn/asyncapi-codegen/pkg/extensions/loggers"
+  log "github.com/albe2669/asyncapi-codegen/pkg/extensions/loggers"
 )
 
 // Only warnings and errors will be printed, info messages are discarded.
@@ -599,7 +599,7 @@ in order to execute it on every published and received messages:
 
 ```golang
 import(
-  "github.com/lerenn/asyncapi-codegen/pkg/extensions/brokers"
+  "github.com/albe2669/asyncapi-codegen/pkg/extensions/brokers"
   // ...
 )
 
@@ -697,8 +697,8 @@ AsyncAPI specifications, you can use the `versioning` package:
 ```golang
 
 import (
-  "github.com/lerenn/asyncapi-codegen/pkg/extensions/brokers/nats"
-  "github.com/lerenn/asyncapi-codegen/pkg/extensions/versioning"
+  "github.com/albe2669/asyncapi-codegen/pkg/extensions/brokers/nats"
+  "github.com/albe2669/asyncapi-codegen/pkg/extensions/versioning"
   v1 "path/to/asyncapi/spec/version/1"
   v2 "path/to/asyncapi/spec/version/2"
 )
@@ -1032,7 +1032,10 @@ channels:
 With the spec above, `SendAs...` derives `userId` from `msg.Payload.UserId`, so
 the message is published on `app.user.<userId>` without passing the parameter
 manually. Supported locations are `$message.payload#/...` and
-`$message.header#/...`, and the targeted field must be a string.
+`$message.header#/...`, and the targeted field must be a string. A parameter
+passed by the caller that contradicts the message value fails the send with
+`extensions.ErrParameterMessageMismatch`: the message is the source of truth
+for the routed value.
 
 ### ErrorHandler
 
@@ -1103,7 +1106,7 @@ provided opt-in middleware to reject invalid messages automatically:
 ```go
 import (
     "github.com/go-playground/validator/v10"
-    "github.com/lerenn/asyncapi-codegen/pkg/extensions/middlewares"
+    "github.com/albe2669/asyncapi-codegen/pkg/extensions/middlewares"
 )
 
 ctrl, _ := NewUserController(broker, WithMiddlewares(

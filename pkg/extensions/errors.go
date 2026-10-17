@@ -39,4 +39,8 @@ var (
 	// carries several message types does not match any of the expected types,
 	// i.e. it could not be unmarshalled and validated against any of them.
 	ErrNoMatchingMessage = fmt.Errorf("%w: no expected message type matched the received message", ErrAsyncAPI)
+
+	// ErrParameterMessageMismatch is raised when a channel parameter set by
+	// the caller contradicts the value carried by the outgoing message.
+	ErrParameterMessageMismatch = fmt.Errorf("%w: parameter does not match the message", ErrAsyncAPI)
 )

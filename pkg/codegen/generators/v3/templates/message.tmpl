@@ -282,22 +282,28 @@ func (msg *{{namify .Name}}) SetAsResponseFrom(req MessageWithCorrelationID) {
 
 {{- /* ---------------------------------------------------------------------- */ -}}
 {{- /* fill-parameters-from-location auto-fills channel parameters that define */ -}}
-{{- /* a `location` runtime expression from the outgoing message, unless the   */ -}}
-{{- /* caller already set them. The dot is the operation. (issue #139)         */ -}}
+{{- /* a `location` runtime expression from the outgoing message. An explicit */ -}}
+{{- /* parameter that contradicts the message fails the send: the message is */ -}}
+{{- /* the source of truth for the routed value. (issue #139)                    */ -}}
 {{- define "fill-parameters-from-location" -}}
 {{- if .Channel.Follow.Parameters}}
 {{- range $pkey, $pvalue := .Channel.Follow.Parameters}}
 {{- if $pvalue.Follow.Location}}
-    // Fill {{namify $pkey}} from the message ({{$pvalue.Follow.Location}}) if not set
-    if params.{{namify $pkey}} == "" {
-        {{- if $pvalue.Follow.LocationRequired}}
-        params.{{namify $pkey}} = msg.{{referenceToStructAttributePath $pvalue.Follow.Location}}
-        {{- else}}
-        if v := msg.{{referenceToStructAttributePath $pvalue.Follow.Location}}; v != nil {
-            params.{{namify $pkey}} = *v
-        }
-        {{- end}}
+    {{- if $pvalue.Follow.LocationRequired}}
+    if v := msg.{{referenceToStructAttributePath $pvalue.Follow.Location}}; params.{{namify $pkey}} != "" && params.{{namify $pkey}} != v {
+        return fmt.Errorf("parameter {{namify $pkey}} is %q but the message carries %q: %w",
+            params.{{namify $pkey}}, v, extensions.ErrParameterMessageMismatch)
     }
+    params.{{namify $pkey}} = msg.{{referenceToStructAttributePath $pvalue.Follow.Location}}
+    {{- else }}
+    if v := msg.{{referenceToStructAttributePath $pvalue.Follow.Location}}; v != nil {
+        if params.{{namify $pkey}} != "" && params.{{namify $pkey}} != *v {
+            return fmt.Errorf("parameter {{namify $pkey}} is %q but the message carries %q: %w",
+                params.{{namify $pkey}}, *v, extensions.ErrParameterMessageMismatch)
+        }
+        params.{{namify $pkey}} = *v
+    }
+    {{- end}}
 {{- end}}
 {{- end}}
 {{- end}}
