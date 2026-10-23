@@ -1,0 +1,82 @@
+asyncapi: 3.0.0
+info:
+  title: cloudevents-proto-test
+  version: 1.0.0
+
+channels:
+  hello:
+    address: v3.cloudevents.proto.hello
+    messages:
+      Hello:
+        $ref: '#/components/messages/Hello'
+  multi:
+    address: v3.cloudevents.proto.multi
+    messages:
+      Ping:
+        $ref: '#/components/messages/Ping'
+      Pong:
+        $ref: '#/components/messages/Pong'
+
+operations:
+  publishHello:
+    action: send
+    channel:
+      $ref: '#/channels/hello'
+  subscribeHello:
+    action: receive
+    channel:
+      $ref: '#/channels/hello'
+  sendMulti:
+    action: send
+    channel:
+      $ref: '#/channels/multi'
+  receiveMulti:
+    action: receive
+    channel:
+      $ref: '#/channels/multi'
+
+components:
+  messages:
+    Hello:
+      contentType: application/cloudevents+protobuf
+      headers:
+        type: object
+        properties:
+          correlationid:
+            type: string
+      payload:
+        schemaFormat: 'application/vnd.google.protobuf;version=3'
+        schema: |
+          syntax = "proto3";
+
+          package hello.v1;
+
+          message HelloPayload {
+            string greeting = 1;
+          }
+      correlationID:
+        location: '$message.header#/correlationid'
+    Ping:
+      contentType: application/cloudevents+protobuf
+      payload:
+        schemaFormat: 'application/vnd.google.protobuf;version=3'
+        schema: |
+          syntax = "proto3";
+
+          package ping.v1;
+
+          message PingPayload {
+            string ping = 1;
+          }
+    Pong:
+      contentType: application/cloudevents+protobuf
+      payload:
+        schemaFormat: 'application/vnd.google.protobuf;version=3'
+        schema: |
+          syntax = "proto3";
+
+          package pong.v1;
+
+          message PongPayload {
+            string pong = 1;
+          }

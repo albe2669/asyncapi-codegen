@@ -2,6 +2,7 @@ package generatorv3
 
 import (
 	"fmt"
+	"path/filepath"
 
 	asyncapi "github.com/albe2669/asyncapi-codegen/pkg/asyncapi/v3"
 	"github.com/albe2669/asyncapi-codegen/pkg/codegen/formats"
@@ -65,6 +66,10 @@ func (g Generator) Generate() (string, error) {
 		return "", err
 	}
 
+	if err := g.runBufForProtos(); err != nil {
+		return "", err
+	}
+
 	content, err := g.generateImports(g.Options)
 	if err != nil {
 		return "", err
@@ -112,12 +117,30 @@ func (g Generator) generateImports(opts options.Options) (string, error) {
 		imps = append(imps, fmt.Sprintf("%q", imp))
 	}
 
+	// Proto CloudEvents messages embed the pb.CloudEvent envelope struct; the
+	// buf pipeline has generated its io/cloudevents/v1 package by now.
+	if g.hasProtoCloudEventsMessages() {
+		envelopeImport := moduleGoPrefix(filepath.Dir(g.Options.OutputPath), g.ModulePath) + "/io/cloudevents/v1"
+		imps = append(imps, fmt.Sprintf("pb %q", envelopeImport))
+	}
+
 	return ImportsGenerator{
 		PackageName:   opts.PackageName,
 		ModuleVersion: g.ModuleVersion,
 		ModuleName:    g.ModulePath,
 		CustomImports: imps,
 	}.Generate()
+}
+
+// hasProtoCloudEventsMessages reports whether any message of the
+// specification uses the protobuf CloudEvents format.
+func (g Generator) hasProtoCloudEventsMessages() bool {
+	for _, msg := range g.Specification.Components.Messages {
+		if f := formats.ForMessage(msg); f != nil && f.MediaType == "application/cloudevents+protobuf" {
+			return true
+		}
+	}
+	return false
 }
 
 func (g Generator) generateTypes() (string, error) {

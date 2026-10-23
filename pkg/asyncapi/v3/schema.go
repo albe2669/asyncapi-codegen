@@ -56,6 +56,12 @@ type Schema struct {
 	Format      string `json:"format,omitempty"`
 	Default     any    `json:"default,omitempty"`
 
+	// Inline payload of a Multi-Format Schema Object. For non-JSON schema
+	// formats (e.g. application/vnd.google.protobuf), 'schema' holds the
+	// raw source text while 'schemaFormat' names its format.
+	SchemaFormat string `json:"schemaFormat,omitempty"`
+	SchemaInline string `json:"schema,omitempty"`
+
 	Reference string `json:"$ref,omitempty"`
 
 	// --- Non Json Schema/AsyncAPI fields -------------------------------------

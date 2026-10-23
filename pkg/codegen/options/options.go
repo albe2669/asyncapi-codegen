@@ -38,4 +38,10 @@ type Options struct {
 
 	// ForcePointers can be used to force all struct fields to be generated as pointers
 	ForcePointers bool
+
+	// BreakingAgainst is the buf breaking target used for
+	// application/cloudevents+protobuf messages: a buf ref (e.g.
+	// '.git#branch=main'), a local path or any 'buf breaking --against'
+	// target. Empty means the last generated output is the baseline.
+	BreakingAgainst string
 }

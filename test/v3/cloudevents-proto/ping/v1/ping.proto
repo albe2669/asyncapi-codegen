@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package ping.v1;
+
+message PingPayload {
+  string ping = 1;
+}

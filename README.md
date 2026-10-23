@@ -25,7 +25,7 @@ to the application/user. Just plug your application to your favorite message bro
   * [Custom broker](#custom-broker)
 * [CLI options](#cli-options)
 * [Advanced topics](#advanced-topics)
-  * [CloudEvents format](#cloudevents-format)
+  * [CloudEvents format](#cloudevents-format) / [Protobuf + CloudEvents](#protobuf--cloudevents)
   * [Middlewares](#middlewares)
   * [Context](#context)
   * [Logging](#logging)
@@ -414,6 +414,94 @@ ctrl, _ := NewUserController(broker, WithMiddlewares(
     middlewares.CloudEventsValidation(validator.New(), func() any { return &UserMessagePayload{} }),
 ))
 ```
+
+#### Protobuf + CloudEvents
+
+AsyncAPI v3 messages can also travel as the official CloudEvents protobuf
+envelope: declare `application/cloudevents+protobuf` in the message
+`contentType`, and describe the payload proto in a Multi-Format Schema Object
+(`schemaFormat` plus inline `schema`):
+
+```yaml
+components:
+  messages:
+    Hello:
+      contentType: application/cloudevents+protobuf
+      payload:
+        schemaFormat: 'application/vnd.google.protobuf;version=3'
+        schema: |
+          syntax = "proto3";
+
+          package hello.v1;
+
+          message HelloPayload {
+            string greeting = 1;
+          }
+```
+
+The generated message struct embeds the `io.cloudevents.v1.CloudEvent` envelope
+and its `Payload` field is the typed Go struct that `buf` compiles from your
+inline proto. The broker payload is the serialized envelope with the message
+packed in its `proto_data` field; the generated code marshals and unmarshals
+it transparently on send and receive.
+
+The payload message name must be the AsyncAPI message name without the
+`Message` suffix, followed by `Payload` (`Hello` expects `HelloPayload`). The
+proto package must be versioned (`hello.v1`) to pass `buf lint` with the
+STANDARD rules: buf requires versioned package names.
+
+Requirements:
+
+* Install the [buf CLI](https://buf.build/docs/installation) and make sure it
+  is in `PATH`. buf is used to lint, check and compile the generated
+  protos. It runs as a binary instead of a Go library because the buf Go
+  API is not a stable public surface and would drag a huge dependency tree
+  into your module.
+* Install `protoc-gen-go` for the local plugin:
+  `go install google.golang.org/protobuf/cmd/protoc-gen-go@latest`. No `protoc`
+  compiler is needed; buf runs the plugin directly.
+* Add the protobuf runtime to your module: `go get google.golang.org/protobuf`.
+  The buf-generated code imports it.
+
+On every generation, the generator writes the proto files from your inline
+schemas, then runs `buf lint` and `buf breaking` on them, and only then
+`buf generate`. A lint or breaking failure aborts generation before any code
+is regenerated, so a bad wire contract cannot reach your repository. The
+first generation skips the breaking check, because there is nothing to break
+against yet.
+
+`buf.yaml` and `buf.gen.yaml` are written next to the generated Go file on
+the first generation and are yours afterwards: the generator never overwrites
+them, so you can tune lint rules, breaking rules or plugins freely. The
+default `buf.gen.yaml` uses `managed` mode with a `go_package_prefix` derived
+from your module's `go.mod`, and the local `protoc-gen-go` plugin. If you
+prefer the remote plugin `buf.build/protocolbuffers/go`, swap it in
+`buf.gen.yaml`: no local `protoc-gen-go` is needed then, but generation
+depends on the Buf Schema Registry being reachable.
+
+The vendored `io/cloudevents/v1/cloudevents.proto` (generated alongside your
+payload protos) is written once and then user-owned as well: buf lint, breaking
+and generate always run against the exact file your code compiles from.
+
+By default, `buf breaking` compares against the previously generated protos
+in your output directory, so regenerating after a wire-breaking edit fails.
+For example, changing a field number of `greeting` is reported against the
+last commit of your generated protos and generation fails:
+
+```console
+hello/v1/hello.proto:6:10:Field "1" on message "HelloPayload" changed name ...
+```
+
+Use `--breaking-against` to compare against any other target, for example a
+git ref in CI:
+
+```console
+asyncapi-codegen -i ./asyncapi.yaml -o ./asyncapi.gen.go --breaking-against '.git#branch=main'
+```
+
+The value is passed verbatim to `buf breaking --against`, so every target buf
+supports works: a git ref, a local directory, a module reference, etc.
+
 
 #### Custom formats
 
@@ -1010,32 +1098,37 @@ nacked and surfaced to the [error handler](#errorhandler) as
 `extensions.ErrNoMatchingMessage`. Operations with a single message are
 unchanged.
 
-### Channel parameters from message location (AsyncAPI v3)
+### Channel parameters (AsyncAPI v3)
 
-When a channel parameter declares a `location` runtime expression, the generated
-send functions auto-fill that parameter from the outgoing message when the
-caller leaves it empty. The parameter stays overridable: if you set it
-explicitly, your value is used as-is.
+When a channel address contains `{parameter}` placeholders, declare each one
+under `parameters` and the generated code will take a parameters struct on
+subscribe, unsubscribe, and send:
 
 ```yaml
 channels:
-  user:
-    address: app.user.{userId}
+  userSignup:
+    address: app.user.{userId}.signedup
     parameters:
       userId:
-        location: $message.payload#/userId
+        description: Id of the user.
     messages:
-      userSignedUp:
-        $ref: '#/components/messages/userSignedUp'
+      user:
+        $ref: '#/components/messages/user'
 ```
 
-With the spec above, `SendAs...` derives `userId` from `msg.Payload.UserId`, so
-the message is published on `app.user.<userId>` without passing the parameter
-manually. Supported locations are `$message.payload#/...` and
-`$message.header#/...`, and the targeted field must be a string. A parameter
-passed by the caller that contradicts the message value fails the send with
-`extensions.ErrParameterMessageMismatch`: the message is the source of truth
-for the routed value.
+With the spec above, subscribing to a specific user channel looks like:
+
+```golang
+params := UserSignupChannelParameters{UserId: "1234"}
+err := app.SubscribeToReceiveUserSignedUpOperation(ctx, params, func(ctx context.Context, msg UserMessageFromUserSignupChannel) error {
+    // ...
+    return nil
+})
+```
+
+The broker subscription is opened on `app.user.1234.signedup`, so only messages
+routed with the same parameter are received. Send, subscribe, and unsubscribe
+functions all take the same parameters struct.
 
 ### ErrorHandler
 

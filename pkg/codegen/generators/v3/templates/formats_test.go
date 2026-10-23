@@ -1,7 +1,9 @@
 package templates
 
 import (
+	"strings"
 	"testing"
+	"text/template"
 
 	asyncapiv3 "github.com/albe2669/asyncapi-codegen/pkg/asyncapi/v3"
 	"github.com/albe2669/asyncapi-codegen/pkg/codegen/formats"
@@ -114,5 +116,93 @@ func TestCloudEventsValidate(t *testing.T) {
 				t.Errorf("unexpected error: %v", err)
 			}
 		})
+	}
+}
+
+func TestCloudEventsProtoValidate(t *testing.T) {
+	validPayload := &asyncapiv3.Schema{
+		SchemaFormat: "application/vnd.google.protobuf;version=3",
+		SchemaInline: "syntax = \"proto3\";\npackage hello.v1;\nmessage HelloPayload {}",
+	}
+
+	cases := []struct {
+		Name        string
+		ContentType string
+		Payload     *asyncapiv3.Schema
+		WantError   string
+	}{
+		{"Valid", "application/cloudevents+protobuf", validPayload, ""},
+		{"Version parameter", "application/cloudevents+protobuf; version=1.0", validPayload, ""},
+		{
+			"Unsupported spec version", "application/cloudevents+protobuf; version=2.0", validPayload,
+			"unsupported CloudEvents spec version",
+		},
+		{
+			"No payload", "application/cloudevents+protobuf", nil,
+			"requires a payload",
+		},
+		{
+			"Wrong schemaFormat", "application/cloudevents+protobuf", &asyncapiv3.Schema{
+				SchemaFormat: "application/vnd.apache.avro;version=1.9.0",
+				SchemaInline: "syntax = \"proto3\";",
+			},
+			"payload schemaFormat must be \"application/vnd.google.protobuf;version=3\"",
+		},
+		{
+			"Empty proto text", "application/cloudevents+protobuf", &asyncapiv3.Schema{
+				SchemaFormat: "application/vnd.google.protobuf;version=3",
+				SchemaInline: "   \n\t",
+			},
+			"'schema' must contain the inline proto definition",
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.Name, func(t *testing.T) {
+			msg := asyncapiv3.Message{Name: "Test", ContentType: c.ContentType, Payload: c.Payload}
+			err := validateCloudEventProtoMessage(&msg)
+
+			if c.WantError == "" {
+				if err != nil {
+					t.Errorf("unexpected error: %v", err)
+				}
+				return
+			}
+			if err == nil || !strings.Contains(err.Error(), c.WantError) {
+				t.Errorf("expected error containing %q, got %v", c.WantError, err)
+			}
+		})
+	}
+}
+
+func TestCloudEventsProtoSnippetsExecute(t *testing.T) {
+	msg := &asyncapiv3.Message{
+		Name:        "Hello",
+		ContentType: "application/cloudevents+protobuf",
+		Payload: &asyncapiv3.Schema{
+			SchemaFormat: "application/vnd.google.protobuf;version=3",
+			SchemaInline: "syntax = \"proto3\";\npackage hello.v1;\nmessage HelloPayload {}",
+		},
+	}
+
+	f := formats.ForMessage(msg)
+	if f == nil {
+		t.Fatal("proto format not registered")
+	}
+
+	funcs := template.FuncMap{
+		"namify":                func(s string) string { return s },
+		"cloudEventSpecVersion": func(m *asyncapiv3.Message) string { return "1.0" },
+	}
+
+	for _, hook := range []string{"StructFields", "ConstructorBody", "BrokerToMessage", "MessageToBroker"} {
+		snippet := f.Snippets.Select(hook)
+		if snippet == "" {
+			t.Errorf("snippet %q must not be empty", hook)
+			continue
+		}
+		if _, err := formats.ExecuteSnippet(f, snippet, msg, funcs); err != nil {
+			t.Errorf("snippet %q failed to execute: %v", hook, err)
+		}
 	}
 }

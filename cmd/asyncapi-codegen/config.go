@@ -9,10 +9,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	// ErrInvalidGenerate happens when using an invalid generation argument.
-	ErrInvalidGenerate = errors.New("invalid generate argument")
-)
+// ErrInvalidGenerate happens when using an invalid generation argument.
+var ErrInvalidGenerate = errors.New("invalid generate argument")
 
 // Flags contains all command line flags.
 type Flags struct {
@@ -46,6 +44,12 @@ type Flags struct {
 
 	// ForcePointers can be used to force all struct fields to be generated as pointers
 	ForcePointers bool
+
+	// BreakingAgainst is the buf breaking target for protobuf CloudEvents
+	// messages: a buf ref (e.g. '.git#branch=main'), a local path or any
+	// 'buf breaking --against' target. Empty means the last generated output
+	// is the baseline.
+	BreakingAgainst string
 }
 
 // SetToCommand adds the flags to a cobra command.
@@ -63,7 +67,13 @@ func (f *Flags) SetToCommand(cmd *cobra.Command) {
 		"Naming scheme for generated golang elements.\nSupported values: camel, pascal, none.")
 	cmd.Flags().BoolVar(&f.IgnoreStringFormat, "ignore-string-format", false,
 		"Ignores the format (date, date-time) on string properties, generating golang string, instead of dates")
-	cmd.Flags().BoolVar(&f.ForcePointers, "force-pointers", false, "Forces all struct fields to be generated as pointers")
+	cmd.Flags().BoolVar(&f.ForcePointers, "force-pointers", false,
+		"Forces all struct fields to be generated as pointers")
+	cmd.Flags().StringVar(&f.BreakingAgainst, "breaking-against", "",
+		"Buf breaking check target for application/cloudevents+protobuf messages.\n"+
+			"Accepts a buf ref (e.g. '.git#branch=main'), a local path or any\n"+
+			"'buf breaking --against' target. Default: use the last generated\n"+
+			"output as the baseline.")
 }
 
 // ToCodegenOptions processes command line flags structure to code generation tool options.
@@ -76,6 +86,7 @@ func (f Flags) ToCodegenOptions() (options.Options, error) {
 		NamingScheme:       f.NamingScheme,
 		IgnoreStringFormat: f.IgnoreStringFormat,
 		ForcePointers:      f.ForcePointers,
+		BreakingAgainst:    f.BreakingAgainst,
 	}
 
 	if f.Generate != "" {
